@@ -1,5 +1,11 @@
 #include "systemcalls.h"
+#include <fcntl.h>
 
+#include <unistd.h>
+#include <stdlib.h>
+
+#include <sys/types.h>
+#include <sys/wait.h>
 /**
  * @param cmd the command to execute with system()
  * @return true if the command in @param cmd was executed
@@ -16,7 +22,15 @@ bool do_system(const char *cmd)
  *   and return a boolean true if the system() call completed with success
  *   or false() if it returned a failure
 */
-
+    int SysCallSuccess = system(cmd);
+    
+    if (SysCallSuccess == -1)
+    {
+    perror("Error");
+    return false;
+    }    
+    
+    
     return true;
 }
 
@@ -58,10 +72,25 @@ bool do_exec(int count, ...)
  *   as second argument to the execv() command.
  *
 */
-
+    
+    int status;
+    pid_t pid;
+    pid = fork();
+    if (pid == -1)
+    return false;
+    else if (pid == 0) {
+        execv(command[0], &command[0]);
+        exit (-1);
+    }
+    
+    
     va_end(args);
 
-    return true;
+    if (waitpid (pid, &status, 0) == -1)
+        return false;
+    else if (WIFEXITED (status) && (WEXITSTATUS(status) == EXIT_SUCCESS))
+        return true;
+    return false;
 }
 
 /**
@@ -84,7 +113,6 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     // and may be removed
     command[count] = command[count];
 
-
 /*
  * TODO
  *   Call execv, but first using https://stackoverflow.com/a/13784315/1446624 as a refernce,
@@ -92,8 +120,34 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *   The rest of the behaviour is same as do_exec()
  *
 */
+	int fd = creat(outputfile,0644);
+	if(fd<0)
+	{
+		return false;
+	}
+
+    int status;
+    pid_t pid;
+    pid = fork ();
+    if (pid == -1)
+        return false;
+    else if (pid == 0) {
+        if (dup2(fd, 1) < 0) 
+        { 
+            perror("dup2 failed"); 
+            return false; 
+        }
+        close(fd);
+        execv(command[0], &command[0]);
+        exit (-1);
+    }
 
     va_end(args);
+    
+    if (waitpid (pid, &status, 0) == -1)
+        return false;
+    else if (WIFEXITED (status) && (WEXITSTATUS(status) == EXIT_SUCCESS))
+        return true;    
+    return false;
 
-    return true;
 }
