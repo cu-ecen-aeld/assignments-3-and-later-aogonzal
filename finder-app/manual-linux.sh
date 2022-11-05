@@ -48,7 +48,7 @@ if [ ! -e ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ]; then
     ####work around for error: https://github.com/BPI-SINOVOIP/BPI-M4-bsp/issues/4
     sed -i 's/^YYLTYPE yylloc/extern YYLTYPE yylloc/g' ${OUTDIR}/linux-stable/scripts/dtc/dtc-lexer.l
     
-    #QEMU build - vmlinux
+    #QEMU build - make all
     echo "build - vmlinux"
     make -j4 ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- all
     
@@ -62,6 +62,9 @@ if [ ! -e ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ]; then
 fi
 
 echo "Adding the Image in outdir"
+cd "$OUTDIR"
+cp linux-stable/arch/arm64/boot/Image "$OUTDIR"
+
 
 echo "Creating the staging directory for the root filesystem"
 cd "$OUTDIR"
@@ -149,9 +152,14 @@ sudo chown -R root:root *
 # TODO: Create initramfs.cpio.gz
 # Linux Root Filesystem pg19
 echo "Create initramfs.cpio.gz"
-cd ${OUTDIR}/rootfs
-find . | cpio -H newc -ov --owner root:root > ../initramfs.cpio
-cd ..
-gzip initramfs.cpio
-sudo chown -R root:root initramfs.cpio.gz
+#cd ${OUTDIR}/rootfs
+#find . | cpio -H newc -ov --owner root:root > ../initramfs.cpio
+#cd ..
+#gzip initramfs.cpio
+#sudo chown -R root:root initramfs.cpio.gz
+
+cd "${OUTDIR}/rootfs"
+find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
+cd "${OUTDIR}"
+gzip -f initramfs.cpio
 
