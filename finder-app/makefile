@@ -1,15 +1,7 @@
-
-ifdef CROSS_COMPILE
-	GCC=$(CROSS_COMPILE)gcc
-else
-	GCC=gcc
-endif
-
-
+CCOMP=gcc
+BUILD_TOOL=
+all: default
 default:
-	$(GCC) -g -Wall -c -o writer.o writer.c
-	$(GCC) -g -Wall -I/  writer.o -o writer
-	
-
+	$(BUILD_TOOL)$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -o writer writer.c $(LDFLAGS)
 clean:
-	rm -f *.o writer
+	@rm -f writer *.o
