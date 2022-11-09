@@ -14,17 +14,6 @@ struct thread_data{
      * between the start_thread_obtaining_mutex function and
      * your thread implementation.
      */
-     
-     //Parameters that start_thread_obtaining_mutex pass in threading.c
-     //param wait_to_obtain_ms number of milliseconds
-     int wait_to_obtain_ms;
-     
-     //param wait_to_release_ms milliseconds
-     int wait_to_release_ms;
-     
-     //mutex pointer
-     pthread_mutex_t* mutex;
-
 
     /**
      * Set to true if the thread completed with success, false
