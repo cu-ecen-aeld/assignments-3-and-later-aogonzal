@@ -1,9 +1,17 @@
 #!/bin/sh
-DAEMON_NAME="aesdsocket"
-AESD_SOCKET_PATH="/usr/bin/"
 
-start-stop-daemon -K --signal TERM --name ${DAEMON_NAME}
+case "$1" in
+    start)
+        echo "Starting aesdsocket"
+        start-stop-daemon -S -n aesdsocket -a /usr/bin/aesdsocket -- -d
+        ;;
+    stop)
+        echo "Stopping aesdsocket"
+        start-stop-daemon -K -n aesdsocket
+        ;;
+    *)
+        echo "Usage: $0 {start|stop}"
+    exit 1
+esac
 
-# Start up the daemon process
-
-start-stop-daemon -S --exec ${AESD_SOCKET_PATH}${DAEMON_NAME} -- -d
+exit 0
