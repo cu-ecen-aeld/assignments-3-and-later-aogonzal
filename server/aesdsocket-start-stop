@@ -1,5 +1,4 @@
 #!/bin/sh
-# In Mastering Embedded Linux Programming CH10. Pg457 of PDF.
 
 case "$1" in
     start)
